@@ -1,0 +1,43 @@
+import java.util.*;
+import java.util.concurrent.*;
+class PangramChecker {
+    private static final boolean[] alpha = new boolean[26];
+    public static void main(String[] args) {
+        Scanner s=new Scanner(System.in);
+        String n = s.nextLine();
+        ExecutorService ex = Executors.newFixedThreadPool(26);
+        for (char c = 'a'; c <= 'z'; c++) {
+            final char character = c;
+            ex.submit(() -> {
+                step();
+                int index = character - 'a';
+                alpha[index] = n.toLowerCase().contains(String.valueOf(character));
+            });
+        }
+        ex.shutdown();
+        try {
+            ex.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean isPangram = true;
+        for (boolean present : alpha) {
+            if (!present) {
+                isPangram = false;
+                break;
+            }
+        }
+        if (isPangram) {
+            System.out.println("The string is a pangram.");
+        } else {
+            System.out.println("The string is not a pangram.");
+        }
+    }
+    private static void step() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
